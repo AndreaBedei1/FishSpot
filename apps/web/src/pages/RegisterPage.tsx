@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import Footer from "../components/Footer";
 
 export default function RegisterPage() {
   const [firstName, setFirstName] = useState('');
@@ -24,10 +25,11 @@ export default function RegisterPage() {
       });
       setSuccess('Registrazione completata con successo! Ora puoi accedere.');
       setTimeout(() => navigate('/login'), 1500);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
       console.error(err);
       setError(
-        err.response?.data?.message || 'Errore durante la registrazione',
+        err.response?.data?.message || ' Errore durante la registrazione',
       );
     }
   };
@@ -154,24 +156,7 @@ export default function RegisterPage() {
         </div>
       </main>
 
-      {/* Footer */}
-      <footer className="py-4 text-gray-700 text-xs text-center">
-        <p>
-          © 2024 Copyright:{' '}
-          <a
-            href="https://isi-seawatch.csr.unibo.it"
-            className="underline hover:text-blue-600"
-          >
-            isi-seawatch.csr.unibo.it
-          </a>
-        </p>
-        <a
-        onClick={() => navigate('/privacy')}
-        className="underline hover:text-blue-600 cursor-pointer"
-        >
-        Informativa privacy
-        </a>
-      </footer>
+    <Footer />  
     </div>
   );
 }

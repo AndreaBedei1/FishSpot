@@ -1,4 +1,5 @@
 import { useNavigate } from "react-router-dom";
+import Footer from "../components/Footer";
 
 export default function PrivacyPage() {
   const navigate = useNavigate();
@@ -276,17 +277,7 @@ export default function PrivacyPage() {
         </div>
       </main>
 
-      <footer className="py-4 text-gray-700 text-xs text-center">
-        <p className="leading-relaxed">
-          © 2024 Copyright:{" "}
-          <a
-            href="https://isi-finspot.csr.unibo.it"
-            className="underline hover:text-blue-600"
-          >
-            isi-seawatch.csr.unibo.it
-          </a>
-        </p>
-      </footer>
+        <Footer />
     </div>
   );
 }

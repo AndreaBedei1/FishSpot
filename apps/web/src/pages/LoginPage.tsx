@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import Footer from "../components/Footer";
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -118,24 +119,7 @@ export default function LoginPage() {
         </div>
       </main>
 
-      {/* Footer */}
-      <footer className="py-4 text-gray-700 text-xs text-center bg-transparent">
-        <p>
-          © 2024 Copyright:{' '}
-          <a
-            href="https://isi-finSpot.csr.unibo.it"
-            className="underline hover:text-blue-600"
-          >
-            isi-finSpot.csr.unibo.it
-          </a>
-        </p>
-        <a
-          onClick={() => navigate('/privacy')}
-          className="underline hover:text-blue-600 cursor-pointer"
-        >
-          Informativa privacy
-        </a>
-      </footer>
+      <Footer />
     </div>
   );
 }
