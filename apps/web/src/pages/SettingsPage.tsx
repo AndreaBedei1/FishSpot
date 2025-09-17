@@ -11,6 +11,8 @@ type User = {
   img?: string;
 };
 
+type MessageType = "success" | "warning" | "error";
+
 export default function SettingsPage() {
   const [user, setUser] = useState<User | null>(null);
   const [firstName, setFirstName] = useState("");
@@ -19,7 +21,14 @@ export default function SettingsPage() {
   const [oldPassword, setOldPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [message, setMessage] = useState("");
+  const [message, setMessage] = useState<string | null>(null);
+  const [messageType, setMessageType] = useState<MessageType>("success");
+
+  const showMessage = (text: string, type: MessageType = "success") => {
+    setMessage(text);
+    setMessageType(type);
+    setTimeout(() => setMessage(null), 3000); // sparisce dopo 3s
+  };
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -35,7 +44,7 @@ export default function SettingsPage() {
         setLastName(res.data.lastName || "");
         setProfileImg(res.data.img || "/default-avatar.png");
       })
-      .catch(() => setMessage("Errore nel caricamento dei dati utente"));
+      .catch(() => showMessage("Errore nel caricamento dei dati utente", "error"));
   }, []);
 
   const handleProfileUpdate = async (e: React.FormEvent) => {
@@ -47,17 +56,16 @@ export default function SettingsPage() {
         { firstName, lastName },
         { headers: { Authorization: `Bearer ${token}` } }
       );
-
-      setMessage("Dati aggiornati con successo");
+      showMessage("Dati aggiornati con successo", "success");
     } catch {
-      setMessage("Errore nell’aggiornamento dei dati");
+      showMessage("Errore nell’aggiornamento dei dati", "error");
     }
   };
 
   const handlePasswordChange = async (e: React.FormEvent) => {
     e.preventDefault();
     if (newPassword !== confirmPassword) {
-      setMessage("Le password non coincidono");
+      showMessage("Le password non coincidono", "warning");
       return;
     }
     try {
@@ -68,12 +76,12 @@ export default function SettingsPage() {
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
-      setMessage("Password aggiornata con successo");
+      showMessage("Password aggiornata con successo", "success");
       setOldPassword("");
       setNewPassword("");
       setConfirmPassword("");
     } catch {
-      setMessage("Errore nel cambio password");
+      showMessage("Errore nel cambio password", "error");
     }
   };
 
@@ -95,41 +103,48 @@ export default function SettingsPage() {
           },
         }
       );
-      setProfileImg(res.data.imgUrl);
-      setMessage("Immagine aggiornata");
+      setProfileImg(`${res.data.imgUrl}?t=${Date.now()}`);
+      showMessage("Immagine aggiornata", "success");
     } catch {
-      setMessage("Errore nell'upload dell'immagine");
+      showMessage("Errore nell'upload dell'immagine", "error");
     }
+  };
+
+  // colori dinamici
+  const bannerColors = {
+    success: "bg-green-600",
+    warning: "bg-yellow-500 text-black",
+    error: "bg-red-600",
   };
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
       <Navbar />
 
-      <main className="flex-grow max-w-3xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
-        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-6">
+      <main className="flex-grow max-w-3xl lg:max-w-5xl xl:max-w-6xl mx-auto w-full px-4 sm:px-6 lg:px-12 py-8 sm:py-12 lg:py-16">
+        <h1 className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-bold text-gray-900 mb-6">
           Impostazioni account
         </h1>
 
         {message && (
-          <p
+          <div
             role="alert"
-            className="mb-4 text-sm text-center font-medium text-blue-600"
+            className={`fixed top-20 left-1/2 -translate-x-1/2 ${bannerColors[messageType]} text-white text-sm lg:text-lg font-medium px-4 lg:px-6 py-2 lg:py-3 rounded-lg shadow-lg z-50`}
           >
             {message}
-          </p>
+          </div>
         )}
 
         {/* Foto profilo */}
         <section className="bg-white shadow rounded-lg p-6 mb-6">
-          <h2 className="text-lg font-semibold mb-4">Foto profilo</h2>
+          <h2 className="text-lg lg:text-xl font-semibold mb-4">Foto profilo</h2>
           <div className="flex items-center space-x-4">
             <img
               src={profileImg}
               alt="Foto profilo"
-              className="w-20 h-20 rounded-full object-cover border"
+              className="w-20 h-20 lg:w-28 lg:h-28 xl:w-32 xl:h-32 rounded-full object-cover border"
             />
-            <label className="cursor-pointer bg-sky-600 text-white px-4 py-2 rounded hover:bg-sky-700 focus:ring-2 focus:ring-offset-2 focus:ring-sky-500 transition">
+            <label className="cursor-pointer bg-sky-600 text-white px-4 py-2 lg:px-6 lg:py-3 rounded hover:bg-sky-700 focus:ring-2 focus:ring-offset-2 focus:ring-sky-500 transition text-sm lg:text-base">
               Cambia foto
               <input
                 type="file"
@@ -146,39 +161,39 @@ export default function SettingsPage() {
           onSubmit={handleProfileUpdate}
           className="bg-white shadow rounded-lg p-6 mb-6 space-y-4"
         >
-          <h2 className="text-lg font-semibold mb-4">Informazioni personali</h2>
+          <h2 className="text-lg lg:text-xl font-semibold mb-4">Informazioni personali</h2>
           <div>
-            <label className="block text-sm font-medium mb-1">Email</label>
+            <label className="block text-sm lg:text-base font-medium mb-1">Email</label>
             <input
               type="email"
               value={user?.email || ""}
               disabled
-              className="w-full border rounded-lg px-3 py-2 bg-gray-100 cursor-not-allowed"
+              className="w-full border rounded-lg px-3 py-2 lg:py-3 text-base lg:text-lg bg-gray-100 cursor-not-allowed"
             />
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium mb-1">Nome</label>
+              <label className="block text-sm lg:text-base font-medium mb-1">Nome</label>
               <input
                 type="text"
                 value={firstName}
                 onChange={(e) => setFirstName(e.target.value)}
-                className="w-full border rounded-lg px-3 py-2"
+                className="w-full border rounded-lg px-3 py-2 lg:py-3 text-base lg:text-lg"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium mb-1">Cognome</label>
+              <label className="block text-sm lg:text-base font-medium mb-1">Cognome</label>
               <input
                 type="text"
                 value={lastName}
                 onChange={(e) => setLastName(e.target.value)}
-                className="w-full border rounded-lg px-3 py-2"
+                className="w-full border rounded-lg px-3 py-2 lg:py-3 text-base lg:text-lg"
               />
             </div>
           </div>
           <button
             type="submit"
-            className="w-full bg-sky-600 text-white py-2 rounded-lg hover:bg-sky-700 focus:ring-2 focus:ring-offset-2 focus:ring-sky-500 transition"
+            className="w-full bg-sky-600 text-white py-2 lg:py-3 text-base lg:text-lg rounded-lg hover:bg-sky-700 focus:ring-2 focus:ring-offset-2 focus:ring-sky-500 transition"
           >
             Salva modifiche
           </button>
@@ -189,9 +204,9 @@ export default function SettingsPage() {
           onSubmit={handlePasswordChange}
           className="bg-white shadow rounded-lg p-6 space-y-4"
         >
-          <h2 className="text-lg font-semibold mb-4">Cambio password</h2>
+          <h2 className="text-lg lg:text-xl font-semibold mb-4">Cambio password</h2>
           <div>
-            <label className="block text-sm font-medium mb-1">
+            <label className="block text-sm lg:text-base font-medium mb-1">
               Password attuale
             </label>
             <input
@@ -199,11 +214,11 @@ export default function SettingsPage() {
               value={oldPassword}
               onChange={(e) => setOldPassword(e.target.value)}
               required
-              className="w-full border rounded-lg px-3 py-2"
+              className="w-full border rounded-lg px-3 py-2 lg:py-3 text-base lg:text-lg"
             />
           </div>
           <div>
-            <label className="block text-sm font-medium mb-1">
+            <label className="block text-sm lg:text-base font-medium mb-1">
               Nuova password
             </label>
             <input
@@ -211,11 +226,11 @@ export default function SettingsPage() {
               value={newPassword}
               onChange={(e) => setNewPassword(e.target.value)}
               required
-              className="w-full border rounded-lg px-3 py-2"
+              className="w-full border rounded-lg px-3 py-2 lg:py-3 text-base lg:text-lg"
             />
           </div>
           <div>
-            <label className="block text-sm font-medium mb-1">
+            <label className="block text-sm lg:text-base font-medium mb-1">
               Conferma nuova password
             </label>
             <input
@@ -223,12 +238,12 @@ export default function SettingsPage() {
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
               required
-              className="w-full border rounded-lg px-3 py-2"
+              className="w-full border rounded-lg px-3 py-2 lg:py-3 text-base lg:text-lg"
             />
           </div>
           <button
             type="submit"
-            className="w-full bg-sky-600 text-white py-2 rounded-lg hover:bg-sky-700 focus:ring-2 focus:ring-offset-2 focus:ring-sky-500 transition"
+            className="w-full bg-sky-600 text-white py-2 lg:py-3 text-base lg:text-lg rounded-lg hover:bg-sky-700 focus:ring-2 focus:ring-offset-2 focus:ring-sky-500 transition"
           >
             Aggiorna password
           </button>

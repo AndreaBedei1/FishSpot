@@ -27,7 +27,7 @@ export default function HomePage() {
       <Navbar />
 
       <main className="flex-grow w-full px-4 sm:px-6 lg:px-8 py-6 sm:py-10">
-        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-4">
+        <h1 className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-bold text-gray-900 mb-4 lg:mb-8">
           Avvistamenti
         </h1>
 
