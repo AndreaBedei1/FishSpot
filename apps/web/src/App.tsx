@@ -4,6 +4,7 @@ import LoginPage from "./pages/LoginPage";
 import HomePage from "./pages/HomePage";
 import RegisterPage from "./pages/RegisterPage";
 import PrivacyPage from "./pages/PrivacyPage";
+import SettingsPage from "./pages/SettingsPage";
 
 function App() {
   const [token, setToken] = useState<string | null>(localStorage.getItem("token"));
@@ -23,6 +24,7 @@ function App() {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/privacy" element={<PrivacyPage />} />
+        <Route path="/settings" element={token ? <SettingsPage /> : <Navigate to="/login" />} />
         <Route
           path="/home"
           element={token ? <HomePage /> : <Navigate to="/login" />}
