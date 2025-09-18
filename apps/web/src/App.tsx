@@ -4,6 +4,7 @@ import LoginPage from "./pages/LoginPage";
 import HomePage from "./pages/HomePage";
 import RegisterPage from "./pages/RegisterPage";
 import PrivacyPage from "./pages/PrivacyPage";
+import SightingPage from "./pages/SightingPage";
 import SettingsPage from "./pages/SettingsPage";
 
 function App() {
@@ -25,6 +26,7 @@ function App() {
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/privacy" element={<PrivacyPage />} />
         <Route path="/settings" element={token ? <SettingsPage /> : <Navigate to="/login" />} />
+        <Route path="/sightings/:id" element={token ? <SightingPage /> : <Navigate to="/login" />} />
         <Route
           path="/home"
           element={token ? <HomePage /> : <Navigate to="/login" />}
