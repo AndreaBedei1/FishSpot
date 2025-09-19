@@ -5,8 +5,9 @@ import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import EditSightingModal from "../components/EditSightingModal";
 import SightingMap from "../components/SightingMap";
-import type { Sighting } from "../types";
 import InfoModal from "../components/InfoModal";
+import SightingImages from "../components/SightingImages"; // 🔹 nuovo componente
+import type { Sighting } from "../types";
 
 export default function SightingPage() {
   const { id } = useParams<{ id: string }>();
@@ -17,9 +18,9 @@ export default function SightingPage() {
   const [showInfoModal, setShowInfoModal] = useState(false);
   const navigate = useNavigate();
 
-  const handleShowInfo = async () => {
-      setSpeciesInfo(sighting.species?.info || null);
-      setShowInfoModal(true);
+  const handleShowInfo = () => {
+    setSpeciesInfo(sighting?.species?.info || null);
+    setShowInfoModal(true);
   };
 
   const loadSighting = async () => {
@@ -61,7 +62,9 @@ export default function SightingPage() {
       <Navbar />
 
       <main className="flex-grow max-w-6xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
-        <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900"> Avvistamento </h1>
+        <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900">Avvistamento</h1>
+
+        {/* Dettagli avvistamento */}
         <div className="bg-white shadow rounded-lg p-6 space-y-4">
           <SightingMap
             latitude={sighting.latitude}
@@ -79,9 +82,7 @@ export default function SightingPage() {
             {sighting.species && (
               <button
                 className="px-2 py-1 text-xs bg-gray-200 rounded hover:bg-gray-300"
-                onClick={ () => {
-                  handleShowInfo()
-                }}
+                onClick={handleShowInfo}
               >
                 Info
               </button>
@@ -91,45 +92,34 @@ export default function SightingPage() {
           <p><strong>Vento:</strong> {sighting.wind || "-"}</p>
           <p><strong>Note:</strong> {sighting.notes || "-"}</p>
 
-
-            <div className="flex justify-end">
-              <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
-                <a
-                  href={`mailto:${sighting.user?.email}`}
-                  className="w-full sm:w-auto px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 text-center"
-                >
-                  Contatta
-                </a>
-                <button
-                  onClick={() => setShowEditModal(true)}
-                  className="w-full sm:w-auto px-4 py-2 bg-sky-600 text-white rounded-lg hover:bg-sky-700"
-                >
-                  Modifica
-                </button>
-                <button
-                  onClick={handleDelete}
-                  className="w-full sm:w-auto px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
-                >
-                  Elimina
-                </button>
-              </div>
+          {/* Bottoni gestione */}
+          <div className="flex justify-end">
+            <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+              <a
+                href={`mailto:${sighting.user?.email}`}
+                className="w-full sm:w-auto px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 text-center"
+              >
+                Contatta
+              </a>
+              <button
+                onClick={() => setShowEditModal(true)}
+                className="w-full sm:w-auto px-4 py-2 bg-sky-600 text-white rounded-lg hover:bg-sky-700"
+              >
+                Modifica
+              </button>
+              <button
+                onClick={handleDelete}
+                className="w-full sm:w-auto px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
+              >
+                Elimina
+              </button>
             </div>
           </div>
-
-        <div className="flex gap-2 mt-6">
-          <button className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700">
-            Aggiungi foto
-          </button>
-          <button className="px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700">
-            Riconosci
-          </button>
         </div>
 
-        {/* Sezione vuota per il futuro */}
-        <section className="mt-10 bg-white shadow rounded-lg p-6">
-          <h2 className="text-lg font-semibold mb-2">Sezione extra</h2>
-          <p className="text-gray-500 text-sm">In arrivo…</p>
-        </section>
+        {/* 📷 Sezione immagini */}
+        <SightingImages sightingId={sighting.id} />
+
       </main>
 
       <Footer />
@@ -142,12 +132,12 @@ export default function SightingPage() {
         onUpdated={loadSighting}
       />
 
+      {/* Modale info specie */}
       <InfoModal
         open={showInfoModal}
         onClose={() => setShowInfoModal(false)}
         info={speciesInfo}
       />
-
     </div>
   );
 }
