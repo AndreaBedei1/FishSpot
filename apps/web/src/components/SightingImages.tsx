@@ -6,6 +6,12 @@ import ImageWithAnnotations from "./ImageWithAnnotations";
 interface Image {
   id: number;
   url: string;
+  annotations?: {
+    id: number;
+    tl_x: number; tl_y: number; br_x: number; br_y: number;
+    specimenId: number | null;
+    specimen?: { id: number; name: string | null } | null;
+  }[];
 }
 
 interface Props {
@@ -20,7 +26,7 @@ export default function SightingImages({ sightingId }: Props) {
     try {
       const token = localStorage.getItem("token");
       const res = await axios.get(
-        `http://localhost:3000/sightings/${sightingId}/images`,
+        `http://localhost:3000/sighting-images/${sightingId}/images`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
       setImages(res.data);
@@ -38,7 +44,7 @@ export default function SightingImages({ sightingId }: Props) {
     try {
       const token = localStorage.getItem("token");
       await axios.post(
-        `http://localhost:3000/sightings/${sightingId}/images`,
+        `http://localhost:3000/sighting-images/${sightingId}/upload`,
         formData,
         {
           headers: {
@@ -53,14 +59,14 @@ export default function SightingImages({ sightingId }: Props) {
     }
   };
 
-  const handleDelete = async (id: number) => {
+  const handleDelete = async (imageId: number) => {
     if (!confirm("Vuoi davvero eliminare questa foto?")) return;
     try {
       const token = localStorage.getItem("token");
-      await axios.delete(`http://localhost:3000/sightings/images/${id}`, {
+      await axios.delete(`http://localhost:3000/sighting-images/${imageId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      setImages((imgs) => imgs.filter((i) => i.id !== id));
+      setImages((imgs) => imgs.filter((i) => i.id !== imageId));
     } catch {
       alert("Errore nell’eliminazione");
     }
@@ -82,16 +88,19 @@ export default function SightingImages({ sightingId }: Props) {
       ) : images.length === 0 ? (
         <p className="text-gray-500 italic">Nessuna foto disponibile.</p>
       ) : (
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-8 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2">
           {images.map((img) => (
             <div key={img.id} className="relative group">
-              <ImageWithAnnotations image={img} />
-              <button
-                onClick={() => handleDelete(img.id)}
-                className="absolute top-2 right-2 bg-red-600 text-white px-2 py-1 text-xs rounded opacity-80 group-hover:opacity-100"
-              >
-                Elimina
-              </button>
+              <ImageWithAnnotations image={img} onSaved={loadImages} />
+              <div className="absolute z-30 top-2 right-2 flex gap-2">
+                <button
+                  onClick={() => handleDelete(img.id)}
+                  className="bg-red-600 text-white px-2 py-1 text-xs rounded opacity-90"
+                  aria-label="Elimina immagine"
+                >
+                  Elimina
+                </button>
+              </div>
             </div>
           ))}
         </div>

@@ -15,3 +15,26 @@ export type Sighting = {
   species?: Species | null;
   user: UserLite;
 };
+
+export interface ServerSpecimen {
+  id: number;
+  name: string | null;
+}
+
+// Annotazione rettangolo su immagine
+export interface ServerAnnotation {
+  id: number;
+  tl_x: number;
+  tl_y: number;
+  br_x: number;
+  br_y: number;
+  specimenId: number | null;
+  specimen?: ServerSpecimen | null;
+}
+
+// Immagine collegata a un avvistamento
+export interface ServerImage {
+  id: number;
+  url: string;
+  annotations?: ServerAnnotation[];
+}
