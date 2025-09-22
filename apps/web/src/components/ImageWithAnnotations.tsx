@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import AnnotationModal from "./AnnotationModal";
 import axios from "axios";
 
 interface ServerSpecimen {
@@ -24,7 +25,13 @@ interface Image {
 
 interface Props {
   image: Image;
-  onSaved?: () => void; // per ricaricare dopo salvataggio annotazione
+  onSaved?: () => void;
+}
+
+// 👇 selectedSpecimen ora è un oggetto {id, name}
+interface SelectedSpecimen {
+  id: number | null;
+  name: string;
 }
 
 export default function ImageWithAnnotations({ image, onSaved }: Props) {
@@ -45,10 +52,12 @@ export default function ImageWithAnnotations({ image, onSaved }: Props) {
   const [showModal, setShowModal] = useState(false);
   const [editingAnnotation, setEditingAnnotation] = useState<ServerAnnotation | null>(null);
   const [specimens, setSpecimens] = useState<ServerSpecimen[]>([]);
-  const [selectedSpecimen, setSelectedSpecimen] = useState<string>("");
+  const [selectedSpecimen, setSelectedSpecimen] = useState<SelectedSpecimen>({ id: null, name: "" });
 
   // modale conferma eliminazione
   const [showDeleteModal, setShowDeleteModal] = useState<null | number>(null);
+
+  const [wounds, setWounds] = useState<{ type: string; severity: string }[]>([]);
 
   // prende size nativa
   const onImgLoad = () => {
@@ -146,14 +155,30 @@ export default function ImageWithAnnotations({ image, onSaved }: Props) {
     }
   };
 
-  // salva annotazione (nuova o modifica)
-  const confirmAnnotation = async () => {
+  // salva annotazione
+  const confirmAnnotation = async (payload: {
+    newWounds: { type: string; severity: string }[];
+    removeWoundIds: number[];
+  }) => {
+    const { newWounds, removeWoundIds } = payload;
+
     try {
       const token = localStorage.getItem("token");
 
-      if (editingAnnotation) {
-        // TODO: endpoint per update se serve
-      } else if (previewRect) {
+      let specimenId: number | null = selectedSpecimen.id;
+
+      // Se non c’è id ma c’è un nome → crea specimen nuovo
+      if (!specimenId && selectedSpecimen.name) {
+        const res = await axios.post(
+          "http://localhost:3000/specimens",
+          { name: selectedSpecimen.name },
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+        specimenId = res.data.id;
+      }
+
+      if (!editingAnnotation && previewRect) {
+        // ➕ Nuova annotazione
         await axios.post(
           `http://localhost:3000/sighting-images/${image.id}/annotations`,
           {
@@ -161,27 +186,53 @@ export default function ImageWithAnnotations({ image, onSaved }: Props) {
             tl_y: Math.round(previewRect.tly),
             br_x: Math.round(previewRect.brx),
             br_y: Math.round(previewRect.bry),
-            specimenName: selectedSpecimen || undefined,
+            specimenName: selectedSpecimen.name, // usa specimenName, lato backend hai l’upsert
           },
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+      } else if (editingAnnotation) {
+        // ✏️ Aggiornamento annotazione esistente
+        await axios.patch(
+          `http://localhost:3000/annotations/${editingAnnotation.id}`,
+          { specimenName: selectedSpecimen.name },
           { headers: { Authorization: `Bearer ${token}` } }
         );
       }
 
-      if (onSaved) onSaved();
-    } catch {
-      console.error("Errore salvataggio annotazione");
+      // 🔄 Aggiorna ferite
+      if (specimenId) {
+        // rimuovi quelle esistenti che l’utente ha tolto
+        for (const wid of removeWoundIds) {
+          await axios.delete(`http://localhost:3000/specimens/wounds/${wid}`, {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+        }
+        // aggiungi quelle nuove
+        for (const wound of newWounds) {
+          await axios.post(
+            `http://localhost:3000/specimens/${specimenId}/wounds`,
+            wound,
+            { headers: { Authorization: `Bearer ${token}` } }
+          );
+        }
+      }
+
+      onSaved?.();
+    } catch (err) {
+      console.error("Errore salvataggio annotazione o ferite:", err);
     } finally {
       setShowModal(false);
       resetDrawing();
       setAnnotateMode(false);
-      setSelectedSpecimen("");
+      setSelectedSpecimen({ id: null, name: "" });
+      setWounds([]);
     }
   };
 
   const cancelAnnotation = () => {
     setShowModal(false);
     resetDrawing();
-    setSelectedSpecimen("");
+    setSelectedSpecimen({ id: null, name: "" });
   };
 
   const deleteAnnotation = async () => {
@@ -263,7 +314,7 @@ export default function ImageWithAnnotations({ image, onSaved }: Props) {
               }}
               onClick={() => {
                 setEditingAnnotation(ann);
-                setSelectedSpecimen(ann.specimen?.name || "");
+                setSelectedSpecimen({ id: ann.specimen?.id ?? null, name: ann.specimen?.name ?? "" });
                 setShowModal(true);
                 loadSpecimens();
               }}
@@ -305,51 +356,14 @@ export default function ImageWithAnnotations({ image, onSaved }: Props) {
         })()}
       </div>
 
-      {/* Modale selezione esemplare */}
       {showModal && (
-        <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center">
-          <div className="bg-white rounded-lg shadow-lg p-6 w-80">
-            <h2 className="text-lg font-semibold mb-4">
-              {editingAnnotation ? "Modifica annotazione" : "Nuova annotazione"}
-            </h2>
-
-            <select
-              value={selectedSpecimen}
-              onChange={(e) => setSelectedSpecimen(e.target.value)}
-              className="w-full border rounded px-2 py-1 mb-3"
-            >
-              <option value="">-- Seleziona esemplare --</option>
-              {specimens.map((s) => (
-                <option key={s.id} value={s.name ?? ""}>
-                  {s.name}
-                </option>
-              ))}
-            </select>
-
-            <input
-              type="text"
-              placeholder="Oppure nuovo esemplare"
-              value={selectedSpecimen}
-              onChange={(e) => setSelectedSpecimen(e.target.value)}
-              className="w-full border rounded px-2 py-1 mb-3"
-            />
-
-            <div className="flex justify-end gap-2">
-              <button
-                onClick={cancelAnnotation}
-                className="px-3 py-1 bg-gray-300 rounded hover:bg-gray-400"
-              >
-                Annulla
-              </button>
-              <button
-                onClick={confirmAnnotation}
-                className="px-3 py-1 bg-sky-600 text-white rounded hover:bg-sky-700"
-              >
-                Conferma
-              </button>
-            </div>
-          </div>
-        </div>
+        <AnnotationModal
+          specimens={specimens}
+          selectedSpecimen={selectedSpecimen}
+          setSelectedSpecimen={setSelectedSpecimen}
+          onCancel={cancelAnnotation}
+          onConfirm={(newWounds) => confirmAnnotation(newWounds)} 
+        />
       )}
 
       {/* Modale elimina */}

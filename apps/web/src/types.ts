@@ -16,10 +16,6 @@ export type Sighting = {
   user: UserLite;
 };
 
-export interface ServerSpecimen {
-  id: number;
-  name: string | null;
-}
 
 // Annotazione rettangolo su immagine
 export interface ServerAnnotation {
@@ -37,4 +33,9 @@ export interface ServerImage {
   id: number;
   url: string;
   annotations?: ServerAnnotation[];
+}
+
+export interface ServerSpecimen {
+  id: number;
+  name: string | null;
 }
