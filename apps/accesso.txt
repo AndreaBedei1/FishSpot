@@ -2,3 +2,6 @@ pnpm start:dev
 
 
 pnpm dev
+
+
+npx expo start
