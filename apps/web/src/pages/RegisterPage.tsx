@@ -17,7 +17,7 @@ export default function RegisterPage() {
     setError('');
     setSuccess('');
     try {
-      await axios.post('http://localhost:3000/auth/register', {
+      await axios.post('http://isi-seawatch.csr.unibo.it:3000/auth/register', {
         firstName,
         lastName,
         email,

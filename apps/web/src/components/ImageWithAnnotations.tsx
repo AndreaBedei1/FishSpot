@@ -146,7 +146,7 @@ export default function ImageWithAnnotations({ image, onSaved }: Props) {
   const loadSpecimens = async () => {
     try {
       const token = localStorage.getItem("token");
-      const res = await axios.get("http://localhost:3000/specimens", {
+      const res = await axios.get("http://isi-seawatch.csr.unibo.it:3000/specimens", {
         headers: { Authorization: `Bearer ${token}` },
       });
       setSpecimens(res.data);
@@ -170,7 +170,7 @@ export default function ImageWithAnnotations({ image, onSaved }: Props) {
       // Se non c’è id ma c’è un nome → crea specimen nuovo
       if (!specimenId && selectedSpecimen.name) {
         const res = await axios.post(
-          "http://localhost:3000/specimens",
+          "http://isi-seawatch.csr.unibo.it:3000/specimens",
           { name: selectedSpecimen.name },
           { headers: { Authorization: `Bearer ${token}` } }
         );
@@ -180,7 +180,7 @@ export default function ImageWithAnnotations({ image, onSaved }: Props) {
       if (!editingAnnotation && previewRect) {
         // ➕ Nuova annotazione
         await axios.post(
-          `http://localhost:3000/sighting-images/${image.id}/annotations`,
+          `http://isi-seawatch.csr.unibo.it:3000/sighting-images/${image.id}/annotations`,
           {
             tl_x: Math.round(previewRect.tlx),
             tl_y: Math.round(previewRect.tly),
@@ -193,7 +193,7 @@ export default function ImageWithAnnotations({ image, onSaved }: Props) {
       } else if (editingAnnotation) {
         // ✏️ Aggiornamento annotazione esistente
         await axios.patch(
-          `http://localhost:3000/annotations/${editingAnnotation.id}`,
+          `http://isi-seawatch.csr.unibo.it:3000/annotations/${editingAnnotation.id}`,
           { specimenName: selectedSpecimen.name },
           { headers: { Authorization: `Bearer ${token}` } }
         );
@@ -203,14 +203,14 @@ export default function ImageWithAnnotations({ image, onSaved }: Props) {
       if (specimenId) {
         // rimuovi quelle esistenti che l’utente ha tolto
         for (const wid of removeWoundIds) {
-          await axios.delete(`http://localhost:3000/specimens/wounds/${wid}`, {
+          await axios.delete(`http://isi-seawatch.csr.unibo.it:3000/specimens/wounds/${wid}`, {
             headers: { Authorization: `Bearer ${token}` },
           });
         }
         // aggiungi quelle nuove
         for (const wound of newWounds) {
           await axios.post(
-            `http://localhost:3000/specimens/${specimenId}/wounds`,
+            `http://isi-seawatch.csr.unibo.it:3000/specimens/${specimenId}/wounds`,
             wound,
             { headers: { Authorization: `Bearer ${token}` } }
           );
@@ -239,7 +239,7 @@ export default function ImageWithAnnotations({ image, onSaved }: Props) {
     if (!showDeleteModal) return;
     try {
       const token = localStorage.getItem("token");
-      await axios.delete(`http://localhost:3000/annotations/${showDeleteModal}`, {
+      await axios.delete(`http://isi-seawatch.csr.unibo.it:3000/annotations/${showDeleteModal}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (onSaved) onSaved();
@@ -290,7 +290,7 @@ export default function ImageWithAnnotations({ image, onSaved }: Props) {
       >
         <img
           ref={imgRef}
-          src={`http://localhost:3000${image.url}`}
+          src={`http://isi-seawatch.csr.unibo.it:3000${image.url}`}
           alt="Foto avvistamento"
           className="w-full h-auto block"
           draggable={false}

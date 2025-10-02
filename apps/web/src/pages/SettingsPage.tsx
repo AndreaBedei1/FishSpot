@@ -35,7 +35,7 @@ export default function SettingsPage() {
     if (!token) return;
 
     axios
-      .get<User>("http://localhost:3000/users/me", {
+      .get<User>("http://isi-seawatch.csr.unibo.it:3000/users/me", {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((res) => {
@@ -52,7 +52,7 @@ export default function SettingsPage() {
     try {
       const token = localStorage.getItem("token");
       await axios.put(
-        "http://localhost:3000/users/me",
+        "http://isi-seawatch.csr.unibo.it:3000/users/me",
         { firstName, lastName },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -71,7 +71,7 @@ export default function SettingsPage() {
     try {
       const token = localStorage.getItem("token");
       await axios.put(
-        "http://localhost:3000/users/change-password",
+        "http://isi-seawatch.csr.unibo.it:3000/users/change-password",
         { oldPassword, newPassword },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -94,7 +94,7 @@ export default function SettingsPage() {
     try {
       const token = localStorage.getItem("token");
       const res = await axios.post(
-        "http://localhost:3000/users/upload-avatar",
+        "http://isi-seawatch.csr.unibo.it:3000/users/upload-avatar",
         formData,
         {
           headers: {

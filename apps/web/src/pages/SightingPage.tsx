@@ -26,7 +26,7 @@ export default function SightingPage() {
   const loadSighting = async () => {
     try {
       const token = localStorage.getItem("token");
-      const res = await axios.get(`http://localhost:3000/sightings/${id}`, {
+      const res = await axios.get(`http://isi-seawatch.csr.unibo.it:3000/sightings/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setSighting(res.data);
@@ -45,7 +45,7 @@ export default function SightingPage() {
     if (!confirm("Sei sicuro di voler eliminare questo avvistamento?")) return;
     try {
       const token = localStorage.getItem("token");
-      await axios.delete(`http://localhost:3000/sightings/${id}`, {
+      await axios.delete(`http://isi-seawatch.csr.unibo.it:3000/sightings/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       navigate("/home");

@@ -16,7 +16,7 @@ export default function HomePage() {
 
   const loadSightings = async () => {
     const token = localStorage.getItem("token");
-    const res = await axios.get("http://localhost:3000/sightings?take=200", {
+    const res = await axios.get("http://isi-seawatch.csr.unibo.it:3000/sightings?take=200", {
       headers: { Authorization: `Bearer ${token}` },
     });
     setSightings(res.data.items);

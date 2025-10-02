@@ -26,7 +26,7 @@ export default function SightingImages({ sightingId }: Props) {
     try {
       const token = localStorage.getItem("token");
       const res = await axios.get(
-        `http://localhost:3000/sighting-images/${sightingId}/images`,
+        `http://isi-seawatch.csr.unibo.it:3000/sighting-images/${sightingId}/images`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
       setImages(res.data);
@@ -44,7 +44,7 @@ export default function SightingImages({ sightingId }: Props) {
     try {
       const token = localStorage.getItem("token");
       await axios.post(
-        `http://localhost:3000/sighting-images/${sightingId}/upload`,
+        `http://isi-seawatch.csr.unibo.it:3000/sighting-images/${sightingId}/upload`,
         formData,
         {
           headers: {
@@ -63,7 +63,7 @@ export default function SightingImages({ sightingId }: Props) {
     if (!confirm("Vuoi davvero eliminare questa foto?")) return;
     try {
       const token = localStorage.getItem("token");
-      await axios.delete(`http://localhost:3000/sighting-images/${imageId}`, {
+      await axios.delete(`http://isi-seawatch.csr.unibo.it:3000/sighting-images/${imageId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setImages((imgs) => imgs.filter((i) => i.id !== imageId));

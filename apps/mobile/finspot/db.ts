@@ -46,7 +46,8 @@ export const openDB = async () => {
       dirty INTEGER DEFAULT 0
     )`);
 
-    console.log("✅ Tabelle create correttamente");
+
+    
     return db;
   } catch (err) {
     console.error("❌ Errore apertura DB:", err);

@@ -92,7 +92,7 @@ export default function LoginScreen() {
     try {
       if (isRegister) {
         // Registrazione
-        await axios.post("http://192.168.1.32:3000/auth/register", {
+        await axios.post("http://192.168.1.22:3000/auth/register", {
           nome,
           cognome,
           email,
@@ -106,7 +106,7 @@ export default function LoginScreen() {
         setConfirmPassword("");
       } else {
         // Login
-        const res = await axios.post("http://192.168.1.32:3000/auth/login", {
+        const res = await axios.post("http://192.168.1.22:3000/auth/login", {
           email,
           password,
         });

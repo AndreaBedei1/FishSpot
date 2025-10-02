@@ -32,14 +32,14 @@ export default function AddSightingModal({ open, onClose, onAdded }: Props) {
   useEffect(() => {
     if (open) {
       // carico animali disponibili
-      axios.get("http://localhost:3000/animals").then((res) => setAnimals(res.data));
+      axios.get("http://isi-seawatch.csr.unibo.it:3000/animals").then((res) => setAnimals(res.data));
     }
   }, [open]);
 
   useEffect(() => {
     if (formData.animalId) {
       axios
-        .get(`http://localhost:3000/species?animalId=${formData.animalId}`)
+        .get(`http://isi-seawatch.csr.unibo.it:3000/species?animalId=${formData.animalId}`)
         .then((res) => setSpecies(res.data));
     } else {
       setSpecies([]);
@@ -60,7 +60,7 @@ export default function AddSightingModal({ open, onClose, onAdded }: Props) {
     try {
       const token = localStorage.getItem("token");
       await axios.post(
-        "http://localhost:3000/sightings",
+        "http://isi-seawatch.csr.unibo.it:3000/sightings",
         {
           date: formData.date,
           specimens: Number(formData.specimens),

@@ -70,12 +70,16 @@ export default function MapSection({ sightings }: { sightings: Sighting[] }) {
   );
 }
 
-// fallback colori per animale (solo tipologia)
 function colorByAnimal(name: string): string {
   const n = name.toLowerCase();
-  if (n.includes('delfin')) return '#0ea5e9';     // sky
-  if (n.includes('tartarug')) return '#10b981';   // emerald
-  if (n.includes('balen')) return '#a855f7';      // violet
-  if (n.includes('uccell') || n.includes('gabbian')) return '#f59e0b'; // amber
-  return '#ef4444'; // red default
+
+  if (n.includes('balen')) return '#a855f7';    // violet
+  if (n.includes('delfin')) return '#0ea5e9';   // sky blue
+  if (n.includes('foca')) return '#64748b';     // slate gray
+  if (n.includes('razza')) return '#14b8a6';    // teal
+  if (n.includes('squal')) return '#ef4444';    // red
+  if (n.includes('tartarug')) return '#10b981'; // emerald green
+  if (n.includes('tonn')) return '#f59e0b';     // amber
+  return '#6b7280'; // gray default
 }
+

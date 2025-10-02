@@ -12,7 +12,7 @@ export default function LoginPage() {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const res = await axios.post('http://localhost:3000/auth/login', {
+      const res = await axios.post('http://isi-seawatch.csr.unibo.it:3000/auth/login', {
         email,
         password,
       });

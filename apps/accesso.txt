@@ -1,7 +1,21 @@
 pnpm start:dev
+pnpm build
+node dist/main.js
+pnpm add -g pm2
+pm2 start dist/main.js --name fishspot-backend
+pm2 save
+pm2 startup
+
+
+[PM2] Freeze a process list on reboot via:
+$ pm2 save
+[PM2] Remove init script via:
+$ pm2 unstartup systemd
 
 
 pnpm dev
 
+npx expo prebuild
+npx expo run:android
+npx expo run:ios
 
-npx expo start

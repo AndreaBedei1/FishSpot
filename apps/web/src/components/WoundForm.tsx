@@ -19,7 +19,7 @@ export default function WoundForm({ specimenId, onSaved }: Props) {
       setLoading(true);
       const token = localStorage.getItem("token");
       await axios.post(
-        `http://localhost:3000/specimens/${specimenId}/wounds`,
+        `http://isi-seawatch.csr.unibo.it:3000/specimens/${specimenId}/wounds`,
         { type, severity },
         { headers: { Authorization: `Bearer ${token}` } }
       );
